@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchkit × Google Cloud Integration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, 
+                #0f1b33 0%, 
+                #1a2b4a 25%, 
+                #2a3f6a 50%, 
+                #1e3a8a 75%, 
+                #0c4a6e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(66, 133, 244, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 168, 83, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(251, 188, 5, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism Base Style */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .company-name h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, #a0c8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .company-name p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .contact-info {
+            text-align: right;
+        }
+
+        .contact-info a {
+            color: #8ab4f8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        .contact-info a:hover {
+            color: #fff;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-bottom: 40px;
+        }
+
+        .hero h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fff, #8ab4f8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.6;
+            opacity: 0.9;
+            max-width: 800px;
+        }
+
+        .highlight {
+            color: #34A853;
+            font-weight: 600;
+        }
+
+        /* Google Cloud Integration Section */
+        .integration-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: #4285F4;
+            font-size: 36px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        .google-blue { color: #4285F4; }
+        .google-green { color: #34A853; }
+        .google-yellow { color: #FBBC05; }
+        .google-red { color: #EA4335; }
+
+        .service-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .service-card p {
+            font-size: 16px;
+            line-height: 1.5;
+            opacity: 0.85;
+            flex-grow: 1;
+        }
+
+        /* Benefits Section */
+        .benefits-section {
+            margin-bottom: 40px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .benefit-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .benefit-icon {
+            background: rgba(52, 168, 83, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 22px;
+            color: #34A853;
+        }
+
+        .benefit-content h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .benefit-content p {
+            font-size: 16px;
+            opacity: 0.85;
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4285F4, #34A853);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #8ab4f8;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .copyright {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .contact-info {
+                text-align: left;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .section-title {
+                font-size: 26px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="glass-card">
+            <div class="logo-section">
+                <div class="logo">M</div>
+                <div class="company-name">
+                    <h1>Merchkit</h1>
+                    <p>AI-Powered Merchandising Automation</p>
+                </div>
+            </div>
+            <div class="contact-info">
+                <a href="https://merchkit.tech" target="_blank">https://merchkit.tech</a>
+                <a href="mailto:bijan@merchkit.tech">bijan@merchkit.tech</a>
+                <p>Vancouver, Canada</p>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero glass-card">
+            <h2>Transform Manual Merchandising into Automated Excellence</h2>
+            <p>Merchkit helps retailers, marketplaces, and brands quickly convert manual merchandising and product catalog operations into <span class="highlight">automated, error-free workflows</span>. Our AI-native platform enables faster product onboarding and launch, maintaining consistent, high-quality product listings across all channels.</p>
+        </section>
+
+        <!-- Google Cloud Integration -->
+        <section class="integration-section">
+            <h2 class="section-title"><i class="fab fa-google"></i> Google Cloud Integration</h2>
+            
+            <div class="services-grid">
+                <div class="service-card glass-card">
+                    <div class="service-icon google-blue">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Vertex AI</h3>
+                    <p>Custom ML models for automated product classification, attribute generation, and intelligent catalog enrichment.</p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon google-green">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Vision API</h3>
+                    <p>Extract text and features from product images, validate visual quality, and automate image-based cataloging.</p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon google-yellow">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>BigQuery</h3>
+                    <p>Real-time analytics and reporting on product performance with scalable data warehousing and insights.</p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon google-red">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Cloud Functions</h3>
+                    <p>Event-driven workflow automation for seamless product synchronization and real-time updates.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <section class="benefits-section">
+            <h2 class="section-title"><i class="fas fa-star"></i> Key Benefits</h2>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card glass-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4>70% Faster Product Launch</h4>
+                        <p>Reduce time-to-market with automated workflows and AI-driven product onboarding.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card glass-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Error-Free Operations</h4>
+                        <p>Minimize manual errors with consistent, automated product data management.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card glass-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Scalable Infrastructure</h4>
+                        <p>Leverage Google Cloud's global infrastructure for reliable, secure, and scalable operations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-section">
+            <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Performance Metrics</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-number">70%</div>
+                    <div class="stat-label">Faster Product Launch</div>
+                </div>
+                
+                <div class="stat-card glass-card">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Reduction in Errors</div>
+                </div>
+                
+                <div class="stat-card glass-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Automated Operations</div>
+                </div>
+                
+                <div class="stat-card glass-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Google Cloud Powered</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="glass-card">
+            <div class="footer-links">
+                <a href="https://merchkit.tech" target="_blank">Visit Website</a>
+                <a href="mailto:bijan@merchkit.tech">Contact Sales</a>
+                <a href="#">Solution Documentation</a>
+                <a href="#">Case Studies</a>
+            </div>
+            <p class="copyright">© 2023 Merchkit. All rights reserved. Powered by Google Cloud.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add subtle animations to glass cards on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.glass-card');
+            
+            // Initial animation
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Hover effect enhancement
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+            });
+            
+            // Add Google Cloud color animation to logo
+            const logo = document.querySelector('.logo');
+            let colorIndex = 0;
+            const googleColors = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'];
+            
+            function animateLogoColors() {
+                logo.style.background = `linear-gradient(135deg, ${googleColors[colorIndex]}, ${googleColors[(colorIndex + 1) % 4]})`;
+                colorIndex = (colorIndex + 1) % 4;
+            }
+            
+            // Animate logo every 3 seconds
+            setInterval(animateLogoColors, 3000);
+        });
+    </script>
+</body>
+</html>
